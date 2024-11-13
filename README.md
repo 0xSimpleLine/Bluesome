@@ -1,4 +1,4 @@
-Ce protocole est un logiciel, incluant une interface graphique sous next js, un backend en Rust sous Tauri et une base de données sqlite3 qui stocke les secrets (données dont l'utilisateur souhaite crypter). Il combine plusieurs primitives cryptographiques telles que AEAD mode GCM, Argon 2, SHA-256, ces primitives réunis assure l'intégrité et la confidentialité des données. Parmis les fonctionnalités nous retrouverons:
+Ce protocole est un logiciel, incluant une interface graphique sous React js, un backend en Rust sous Tauri et une base de données sqlite3 qui stocke les secrets (données dont l'utilisateur souhaite crypter). Il combine plusieurs primitives cryptographiques telles que AEAD mode GCM, Argon 2, SHA-256, ces primitives réunis assure l'intégrité et la confidentialité des données. Parmis les fonctionnalités nous retrouverons:
 
 **F1- Authentification:** 
 Pour utiliser le logiciel, l’utilisateur devra s'authentifier en fournissant son nom d’utilisateur et son mot de passe.
