@@ -1,26 +1,25 @@
-Ce protocole est un logiciel, incluant une interface graphique sous React js, un backend en Rust sous Tauri et une base de données sqlite3 qui stocke les secrets (données dont l'utilisateur souhaite crypter). Il combine plusieurs primitives cryptographiques telles que AEAD mode GCM, Argon 2, SHA-256, ces primitives réunis assure l'intégrité et la confidentialité des données. Parmis les fonctionnalités nous retrouverons:
+This protocol is a software package, including a graphical interface under React js, a Rust backend under Tauri and a sqlite3 database that stores the secrets (data the user wishes to encrypt). It combines several cryptographic primitives such as AEAD mode GCM, Argon 2, SHA-256, which together ensure data integrity and confidentiality. Features include
 
-**F1 - Authentification:** 
-Pour utiliser le logiciel, l’utilisateur devra s'authentifier en fournissant son nom d’utilisateur et son mot de passe.
+**F1 - Authentication:** 
+To use the software, users must authenticate themselves by providing their password.
 
-**F2 - Gestionnaire de secret:**
-Après authentification l’utilisateur arrive dans la page ou il pourra gérer l'ensemble des secrets stocker dans la base de données, chaque caractère du secret est caché par un étoile. Dans le gestionnaire l’utilisateur pourra voir le texte d’origine (décrypter), ajouter, copier, supprimer et modifier un secret.
+**F2 - Secret manager:**
+After authentication, the user is taken to a page where he can manage all the secrets stored in the database. Each secret character is hidden by a star. In the manager, the user can view the original text (decrypt), add, copy, delete and modify a secret.
 
-## Sécurité
-Les primitives cryptographiques citées ci-dessus sont introduites dans le protocole et utilisées pour effectuer les opérations suivante:
+## Security
+The cryptographic primitives mentioned above are introduced into the protocol and used to perform the following operations:
 
-1. Dérivations des clés:
-Le mot de passe dans le système est nommé la “Master Key”, c’est une donnees qui est hashé avec la fonction de hashage Argon 2 pour générer 2 nouvelles clés soit K1 et K2 qui sont utilisés pour le cryptage et le décryptage de certains paramètres sensibles et tous les secrets.
+1. Key derivations:
+The password in the system is called the “Master Key”, it is data that is hashed with the Argon 2 hashing function to generate 2 new keys K1 and K2 which are used for encryption and decryption of certain sensitive parameters and all secrets.
 
-2. Cryptage de paramètres sensibles:
-Parmi les paramètres utilisés par AEAD-GCM un seul paramètre est crypté, soit la DA (Data Associated), c’est un paramètre qui permet d’assurer l'intégrité des secrets, elle est crypté sous AEAD-GCM avec la clé dérivée K1, un nonce unique pour déverrouiller ce paramètre et sans DA. Si un attaquant retrouve ce paramètre, il pourra facilement retrouver le texte d’origine et modifier les secrets. Les paramètres comme les nonces uniques pour chaque secret et le nonce pour déverrouiller le paramètre DA sont stockés dans la base de données sans être cryptés.
+2. Encryption of sensitive parameters:
+Among the parameters used by AEAD-GCM, only one is encrypted, the DA (Data Associated), a parameter that ensures the integrity of secrets. It is encrypted under AEAD-GCM with the derived key K1, a unique nonce to unlock this parameter and without DA. If an attacker finds this parameter, he can easily retrieve the original text and modify the secrets. Parameters such as the unique nonces for each secret and the nonce to unlock the DA parameter are stored in the database without being encrypted.
 
-3. Les secrets:
-Comme expliqué plus tôt, les secrets sont des informations dont l’utilisateur souhaite crypter. Lorsqu’un utilisateur ajoute un secret, la clé dérivée K2 et la DA décrypter seront utilisées dans la primitive AEAD-GCM pour la crypter. Lorsque l’utilisateur décrypte l’information, elle sera visible pendant 15 secondes, après elle sera de nouveaux crypter. Lors d’une modification d’un secret l’utilisateur ne verra pas le secret, la nouvelle modification vient écraser la précédente sans une opération de décryptage du secret précédent.
+3. Secrets:
+As explained earlier, secrets are information that the user wishes to encrypt. When a user adds a secret, the derived key K2 and the decrypt DA will be used in the AEAD-GCM primitive to encrypt it. When the user decrypts the information, it will be visible for 15 seconds, after which it will be encrypted again. When a secret is modified, the user will not see the secret; the new modification overwrites the previous one without a decryption operation of the previous secret.
 
-4. La base de données:
-Dans la base de données, les informations les moins sensibles comme le nonce sont stockées sans être cryptées mais les informations plus sensibles sont stockées en étant cryptées comme les secrets et la DA.
+4. The database:
+In the database, less sensitive information, such as the nonce, is stored unencrypted, but more sensitive information, such as secrets and the DA, is stored encrypted.
 
-5. La mémoire:
-Pour éviter qu’un logiciel malveillant puisse facilement retrouver les informations décryptées ou cryptées dans la mémoire de la machine, les données de base de données, les données seront très peu stockées dans la mémoire.
-
+5. Memory:
+To prevent malicious software from easily retrieving decrypted or encrypted information from the machine's memory, very little data will be stored in the buffer.
