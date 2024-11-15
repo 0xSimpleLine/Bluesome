@@ -12,9 +12,5 @@ pub fn decode_from_hex(value: String) -> Result<Vec<u8>, String>{
 #[cfg(test)]
 mod test_processing{
     use super::*;
-    pub use app_crypto::processing::encryption::*;
-
-    #[test]
-    fn encrypt_params() {
-    }   
+    use app_crypto_lib::processing::encryption::*;
 }

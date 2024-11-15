@@ -1,3 +1,3 @@
 pub mod encryption;
 pub mod decryption;
-pub mod encoder;
+pub mod utils;
