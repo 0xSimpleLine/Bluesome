@@ -1,5 +1,5 @@
 use aes_gcm::{
-    aead::{Aead, AeadInPlace, AeadCore, KeyInit},
+    aead::{Aead, AeadInPlace, KeyInit},
     Aes256Gcm, Key, Nonce
 };
 
