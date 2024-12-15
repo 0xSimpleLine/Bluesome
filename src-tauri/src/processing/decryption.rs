@@ -4,7 +4,7 @@ use aes_gcm::{
 };
 
 // To decrypt data from database
-pub fn decrypt_data(key: &[u8], nonce: &[u8], da: [u8; 32], cipher_text: Vec<u8>) -> Result<Vec<u8>, String>{
+pub fn decrypt_secret(key: &[u8], nonce: &[u8], da: [u8; 32], cipher_text: Vec<u8>) -> Result<Vec<u8>, String>{
     let mut plaint_text = cipher_text;
     let key = Key::<Aes256Gcm>::from_slice(key);
     let nonce = Nonce::from_slice(nonce);
