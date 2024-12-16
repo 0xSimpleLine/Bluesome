@@ -24,7 +24,6 @@ mod test_processing{
         let key_1 = decode_from_hex("0000000000000000000000000000000000000000000000000000000000000000".to_string()).unwrap();
         let nonce_1 = decode_from_hex("000000000000000000000000".to_string()).unwrap();
         let plaint_text_1 = "".as_bytes().to_vec();
-        let cypher_text_1 = "".as_bytes().to_vec();
         let tag_1 = "530f8afbc74536b9a963b4f1c4cb738b";
         let result_1 = encrypt_params(key_1.as_slice(), nonce_1.as_slice(), plaint_text_1).unwrap();
         assert_eq!(encode_to_hex(result_1), tag_1.to_string());
@@ -45,8 +44,6 @@ mod test_processing{
         // Phase 1 
         let key_1 = decode_from_hex("0000000000000000000000000000000000000000000000000000000000000000".to_string()).unwrap();
         let nonce_1 = decode_from_hex("000000000000000000000000".to_string()).unwrap();
-        let plaint_text_1 = "".as_bytes().to_vec();
-        let cypher_text_1 = "".as_bytes().to_vec();
         let tag_1 = decode_from_hex("530f8afbc74536b9a963b4f1c4cb738b".to_string()).unwrap();
         let result_1 = decrypt_params(key_1.as_slice(), nonce_1.as_slice(), tag_1).unwrap();
         assert_eq!(encode_to_hex(result_1), "");
@@ -105,8 +102,20 @@ mod test_processing{
         assert_eq!(encode_to_hex(result_2), format!("{}", plaint_text_2));
     }
 
-    //#[test]
-    //fn base64_encoder_decoder_test(){
-        
-    //}
+    #[test]
+    fn base64_encoder_decoder_test(){
+        let data_1 = "This is a secret".as_bytes().to_vec();     
+        let trust_result_1 = "VGhpcyBpcyBhIHNlY3JldA==";
+        let result_encoder_1 = encode_to_base64(data_1.clone());
+        let result_decoder_1 = decode_from_base64(result_encoder_1.clone()).unwrap();
+        assert_eq!(result_encoder_1, trust_result_1);
+        assert_eq!(result_decoder_1, data_1);
+
+        let data_2 = "In cryptography, Galois/Counter Mode (GCM)[1] is a mode of operation for symmetric-key cryptographic block ciphers which is widely adopted for its performance.".as_bytes().to_vec();
+        let trust_result_2 = "SW4gY3J5cHRvZ3JhcGh5LCBHYWxvaXMvQ291bnRlciBNb2RlIChHQ00pWzFdIGlzIGEgbW9kZSBvZiBvcGVyYXRpb24gZm9yIHN5bW1ldHJpYy1rZXkgY3J5cHRvZ3JhcGhpYyBibG9jayBjaXBoZXJzIHdoaWNoIGlzIHdpZGVseSBhZG9wdGVkIGZvciBpdHMgcGVyZm9ybWFuY2Uu";
+        let result_encoder_2 = encode_to_base64(data_2.clone());
+        let result_decoder_2 = decode_from_base64(result_encoder_2.clone()).unwrap();
+        assert_eq!(result_encoder_2, trust_result_2);
+        assert_eq!(result_decoder_2, data_2);
+    }
 }
