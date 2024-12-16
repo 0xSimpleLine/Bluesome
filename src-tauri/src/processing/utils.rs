@@ -1,7 +1,7 @@
 use rustc_serialize::base64::{STANDARD, ToBase64, FromBase64};
 
 //encode String to base64
-pub fn encode_to_bae64(value: Vec<u8>) -> String{
+pub fn encode_to_base64(value: Vec<u8>) -> String{
     value.to_base64(STANDARD)
 }
 

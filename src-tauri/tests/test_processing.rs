@@ -13,8 +13,9 @@ pub fn decode_from_hex(value: String) -> Result<Vec<u8>, String>{
 #[cfg(test)]
 mod test_processing{
     use super::*;
-    use app_crypto_lib::processing::encryption::*;
-    use app_crypto_lib::processing::decryption::*;
+    use bluesome_lib::processing::encryption::*;
+    use bluesome_lib::processing::decryption::*;
+    use bluesome_lib::processing::utils::*;
 
     // Testing the encryption function for parameters
     #[test]
@@ -103,4 +104,9 @@ mod test_processing{
         let result_2 = decrypt_secret(key_2.as_slice(), nonce_2.as_slice(), aad_2.as_slice(), cipher_text_2).unwrap();
         assert_eq!(encode_to_hex(result_2), format!("{}", plaint_text_2));
     }
+
+    //#[test]
+    //fn base64_encoder_decoder_test(){
+        
+    //}
 }
