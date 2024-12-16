@@ -1,5 +1,7 @@
 pub mod processing;
+pub mod auth;
 pub use crate::processing::*;
+pub use crate::auth::*;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
