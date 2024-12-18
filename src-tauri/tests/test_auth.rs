@@ -6,9 +6,16 @@ mod test_auth{
 
     #[test]
     fn hash_password_test(){
-        let data = "hello world".to_string(); 
-        let trust_result = "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9".to_string();
-        let result = verify_password(data.clone(), trust_result).unwrap();
-        assert_eq!(result, data);
+        //Phase 1
+        let data_1 = "hello world".to_string(); 
+        let trust_result_1 = "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9".to_string();
+        let result_1 = verify_password(data_1.clone(), trust_result_1).unwrap();
+        assert_eq!(result_1, data_1);
+
+        //Phase 2
+        let data_2 = "de188941a3375d3a8a061e67576e926d".to_string();
+        let trust_result_2 = "57e918cfef3bd4ecd82e1e01771a60efa713df3d3281f61c785b7f7920e853b7".to_string();
+        let result_2 = verify_password(data_2.clone(), trust_result_2).unwrap();
+        assert_eq!(result_2, data_2);
     }
 }

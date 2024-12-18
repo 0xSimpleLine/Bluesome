@@ -4,12 +4,12 @@ use aes_gcm::{
 };
 
 // To encrypt data from database
-pub fn encrypt_secret(key: &[u8], nonce: &[u8], da: &[u8], plaint_text: Vec<u8>) -> Result<Vec<u8>, String> {
+pub fn encrypt_secret(key: &[u8], nonce: &[u8], ad: &[u8], plaint_text: Vec<u8>) -> Result<Vec<u8>, String> {
     let mut cipher_text = plaint_text;
     let key = Key::<Aes256Gcm>::from_slice(key);
     let nonce = Nonce::from_slice(nonce);
     let cipher = Aes256Gcm::new(key);
-    cipher.encrypt_in_place(nonce, da.as_ref(), &mut cipher_text).expect("Encryption failed");
+    cipher.encrypt_in_place(nonce, ad.as_ref(), &mut cipher_text).expect("Encryption failed");
     Ok(cipher_text)
 }
 
