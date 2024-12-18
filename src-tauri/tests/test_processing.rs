@@ -5,6 +5,7 @@ mod test_processing{
     use bluesome_lib::processing::encryption::*;
     use bluesome_lib::processing::decryption::*;
     use bluesome_lib::processing::utils::*;
+    use bluesome_lib::auth::utils::*;
 
     // Testing the encryption function for parameters
     #[test]

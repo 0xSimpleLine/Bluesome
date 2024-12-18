@@ -1,5 +1,5 @@
 use sha2::{Sha256, Digest};
-use crate::utils::*;
+use crate::auth::utils::*;
 
 pub fn hash(password: &String, output: &mut [u8]){
     let hasher = Sha256::digest(password);
