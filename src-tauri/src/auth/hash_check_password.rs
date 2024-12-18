@@ -1,17 +1,17 @@
-use sha2::{sha256, Digest};
+use sha2::{Sha256, Digest};
+use crate::utils::*;
 
-pub fn hash(password: String) -> String{
-    let mut hasher = Sha256::new();
-    hasher.update(password);
-    return hasher.finalize();
+pub fn hash(password: &String, output: &mut [u8]){
+    let hasher = Sha256::digest(password);
+    output.copy_from_slice(&hasher);
 } 
 
-
 pub fn verify_password(password: String, trust_password: String) -> Result<String, String>{
-    let hash_password = hash(password);
-    if hash_password == trust_password {
-        Ok(password);
+    let mut output = vec![0u8; 32];
+    hash(&password, &mut output);
+    if encode_to_hex(output) == trust_password {
+        return Ok(password);
     } else{
-        Err("Password is incorrect");
+        return Err("Password is incorrect".to_string());
     }
 }
