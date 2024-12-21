@@ -39,7 +39,7 @@ pub fn derivate_key(password: &[u8], salt_1: [u8; 32], salt_2: [u8; 32]) -> Resu
         Argon2::default().hash_password_into(&password_clone_2, &salt_2, &mut output_2).expect("Fail to derivate key");
     }).join().unwrap();
 
-    // return Output 1 and 2
+    // return all outputs
     let last_output = vec![output_1, output_2];
     Ok(last_output)
 }
