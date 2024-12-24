@@ -23,10 +23,10 @@ tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1.41.1", features = ["full"] }
-sqlx = { version = "0.8", features = [ "runtime-tokio", "sqlite" ] }
 argon2 = "0.5.3"
 sha2 = "0.10"
 aes-gcm = "0.10.3"
 rustc-serialize = "0.3.25"
 hex-literal = "0.4.1"
 base64ct = "1.6.0"
+rusqlite = "0.32.1"

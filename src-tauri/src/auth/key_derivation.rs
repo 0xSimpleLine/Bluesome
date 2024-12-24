@@ -6,7 +6,7 @@ use argon2::{
 };
 use std::{thread, sync::{Arc, mpsc}};
 
-fn generate_rng_slice<R>(rng: &mut R) -> [u8; 32]
+pub fn generate_rng_slice<R>(rng: &mut R) -> [u8; 32]
     where 
         R: CryptoRng + RngCore,
 {
