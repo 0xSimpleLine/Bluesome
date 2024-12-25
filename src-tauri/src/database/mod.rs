@@ -19,14 +19,15 @@ pub struct Secret {
 
 fn hash_db_name(rng: &[u8]) -> String {
     let hasher = Sha256::digest(rng);
-    return encode_to_hex(hasher.to_vec());
+    return encode_to_hex(hasher[..10].to_vec());
 }
 
 //This function generate a random slice and stock the name in file txt
 pub fn generate_db_name() -> Result<(), String>{
     let mut rand_slice = [0u8; 16];
     OsRng.fill_bytes(&mut rand_slice);
-    let db_name = hash_db_name(&rand_slice); 
+    let mut db_name = hash_db_name(&rand_slice); 
+    db_name.push_str(".db");
 
     //Create file "file.txt" and write databse
     fs::write("db_file.txt", db_name)
