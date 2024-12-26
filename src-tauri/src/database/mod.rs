@@ -1,4 +1,4 @@
-use rusqlite::{Connection, Result};
+use rusqlite::{Connection, Result, Error};
 use std::{fs, str};
 use sha2::{Sha256, Digest};
 use argon2::password_hash::rand_core::{OsRng, RngCore};
@@ -14,7 +14,7 @@ pub struct Param {
 
 pub struct Secret {
     pub id: String,
-    pub secret: String
+    pub message: String
 }
 
 fn hash_db_name(rng: &[u8]) -> String {
@@ -61,7 +61,7 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
         );
         CREATE TABLE secret (
             id VARCHAR PRIMARY KEY,
-            secret VARCHAR NOT NULL
+            message VARCHAR NOT NULL
         );
         COMMIT;"
     ).expect("Error: Impossible to create tables");
@@ -78,7 +78,34 @@ pub fn create_secret(path: &str, secret: Secret) -> Result<(), String> {
     let conn = connection(path).unwrap();
     conn.execute(
         "INSERT INTO secret (id, secret) VALUES (?1, ?2)",
-        (secret.id, secret.secret)
+        (secret.id, secret.message)
     ).expect("Error: Impossible to stock data");
     Ok(())
 }
+
+
+pub fn read_all_secret(path: &str) -> Result<Vec<Secret>, Error> {
+    let conn = connection(path).unwrap();
+    let mut stmt = conn.prepare("SELECT id, message FROM secret")
+        .expect("Error: Impossible to find data");
+    let rows = stmt.query_map([], |row| {
+        Ok(Secret {
+            id: row.get(0)?,
+            message: row.get(1)?
+        })})?;
+    let mut messages: Vec<Secret> = Vec::new();
+    for row in rows{
+        messages.push(row?);
+    }
+    Ok(messages)
+}
+
+
+pub fn read_secret(path: &str, message: String) -> Result<String, String>{
+    let conn = connection(path).unwrap();
+    let secret = conn.query_row("SELECT message FROM secret WHERE message = ?1",
+        [message],
+        |row| row.get(0)).expect("Error: Impossible to find message");
+    Ok(secret)
+}
+
