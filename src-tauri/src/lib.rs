@@ -1,6 +1,7 @@
 pub mod processing;
 pub mod auth;
 pub mod database;
+pub mod types;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
