@@ -15,7 +15,7 @@ pub fn generate_db_name() -> Result<(), String>{
     let mut rand_slice = [0u8; 16];
     OsRng.fill_bytes(&mut rand_slice);
     let mut db_name = hash_db_name(&rand_slice); 
-    db_name.push_str(".db");
+    db_name.push_str(".sqlite3");
 
     //Create file "file.txt" and write databse
     fs::write("db_file.txt", db_name)
@@ -41,13 +41,13 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
     conn.execute_batch(
         "BEGIN;
         CREATE TABLE param (
-            id VARCHAR PRIMARY KEY,
+            id VARCHAR PRIMARY KEY UNIQUE,
             ad VARCHAR NOT NULL,
             salt1 VARCHAR NOT NULL,
             salt2 VARCHAR NOT NULL
         );
         CREATE TABLE secret (
-            id VARCHAR PRIMARY KEY,
+            id VARCHAR PRIMARY KEY UNIQUE,
             message VARCHAR NOT NULL
         );
         COMMIT;"
@@ -65,7 +65,7 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
 pub fn create_new_secret(path: &str, secret: Secret) -> Result<(), String> {
     let conn = connection(path).unwrap();
     conn.execute(
-        "INSERT INTO secret (id, secret) VALUES (?1, ?2)",
+        "INSERT INTO secret (id, message) VALUES (?1, ?2)",
         (secret.id, secret.message)
     ).expect("Impossible to stock secret");
     conn.close().unwrap();
@@ -91,7 +91,7 @@ pub fn read_all_secret(path: &str) -> Result<Vec<Secret>, Error> {
 }
 
 //Read all data in table Secret 
-pub fn read_secret(path: &str, id: String) -> Result<String, String>{
+pub fn read_secret(path: &str, id: &str) -> Result<String, String>{
     let conn = connection(path).unwrap();
     let secret = conn.query_row("SELECT message FROM secret WHERE id = ?1",
         [id],
