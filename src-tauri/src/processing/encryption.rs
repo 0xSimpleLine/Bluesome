@@ -2,6 +2,22 @@ use aes_gcm::{
     aead::{Aead, AeadInPlace, KeyInit},
     Aes256Gcm, Key, Nonce
 };
+use argon2::password_hash::rand_core::{OsRng, CryptoRng, RngCore};
+
+//Generated a slice with size of 12 bytes (96 bits)
+fn generate_rng_slice<R>(rng: &mut R) -> [u8; 12]
+    where 
+        R: CryptoRng + RngCore,
+{
+    let mut new_random = [0u8; 12];
+    rng.fill_bytes(&mut new_random);
+    new_random
+}
+
+//Geneated the nonce to encrypt and decrypt data
+pub fn generate_salts() -> [u8; 12]{
+    generate_rng_slice(&mut OsRng)
+}
 
 // To encrypt data from database
 pub fn encrypt_secret(key: &[u8], nonce: &[u8], ad: &[u8], plaint_text: Vec<u8>) -> Result<Vec<u8>, String> {
