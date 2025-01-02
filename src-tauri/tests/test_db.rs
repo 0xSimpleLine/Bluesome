@@ -32,7 +32,7 @@ mod test_db {
         create_new_secret(&db_name, secret.clone()).unwrap();
         create_new_secret(&db_name, _secret.clone()).unwrap();
 
-        let secrets = read_all_secret(&db_name).unwrap();
+        let secrets = read_all_secrets(&db_name).unwrap();
         let secret_ = read_secret(&db_name, "foo").unwrap();
 
         assert_eq!(secrets, vec![secret.clone(), _secret.clone()]);
@@ -42,7 +42,7 @@ mod test_db {
         update_secret(&db_name, _secret.clone()).unwrap();
         assert_eq!(_secret.message, "foo".to_string());
 
-        remove_secret(&db_name,_secret.id).unwrap();
+        remove_secret(&db_name,_secrets.id).unwrap();
         let _secrets = read_all_secret(&db_name).unwrap();
         assert_eq!(_secrets, vec![secret]);
 

@@ -12,6 +12,7 @@ fn hash_db_name(rng: &[u8]) -> String {
 
 //This function generate a random slice and stock the name in file txt
 pub fn generate_db_name() -> Result<(), String>{
+    //Generate a random data
     let mut rand_slice = [0u8; 16];
     OsRng.fill_bytes(&mut rand_slice);
     let mut db_name = hash_db_name(&rand_slice); 
@@ -23,21 +24,24 @@ pub fn generate_db_name() -> Result<(), String>{
     Ok(())
 }
 
-//Read DB File
+//Read DB File and return his content
 pub fn read_db_file() -> Result<String, String>{
     let content = fs::read_to_string("db_file.txt")
         .expect("Impossible to read file");
     Ok(content)
 }
 
-//Connect to database or create new database
+//get the content of db file to connect to database or create new database if don't exist
 fn connection(path: &str) -> Result<Connection, String> {
   let db = Connection::open(path).expect("Impossible to connect in database");  Ok(db)
 }
 
-//create db and tables 
+//create db, tables and insert data for table param
 pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
+    //Create db if don't exist
     let conn = connection(path).unwrap();
+
+    //Run command to create table 
     conn.execute_batch(
         "BEGIN;
         CREATE TABLE param (
@@ -53,6 +57,7 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
         COMMIT;"
     ).expect("Impossible to create tables");
 
+    //Insert data into table param
     conn.execute(
         "INSERT INTO param (id, ad, salt1, salt2) VALUES (?1, ?2, ?3, ?4)",
         (param.id, param.ad, param.salt1, param.salt2),
@@ -61,7 +66,7 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
     Ok(())
 }
 
-//Inserte data in table Secret
+//Insert data in table secret
 pub fn create_new_secret(path: &str, secret: Secret) -> Result<(), String> {
     let conn = connection(path).unwrap();
     conn.execute(
@@ -72,8 +77,8 @@ pub fn create_new_secret(path: &str, secret: Secret) -> Result<(), String> {
     Ok(())
 }
 
-//Read all data in table Secret
-pub fn read_all_secret(path: &str) -> Result<Vec<Secret>, Error> {
+//Read all data from table secret
+pub fn read_all_secrets(path: &str) -> Result<Vec<Secret>, Error> {
     let conn = connection(path).unwrap();
     let mut stmt = conn.prepare("SELECT id, message FROM secret")
         .expect("Impossible to read all secrets");
@@ -90,7 +95,7 @@ pub fn read_all_secret(path: &str) -> Result<Vec<Secret>, Error> {
     Ok(messages)
 }
 
-//Read all data in table Secret 
+//Read one data from table secret 
 pub fn read_secret(path: &str, id: &str) -> Result<String, String>{
     let conn = connection(path).unwrap();
     let secret = conn.query_row("SELECT message FROM secret WHERE id = ?1",
@@ -100,6 +105,7 @@ pub fn read_secret(path: &str, id: &str) -> Result<String, String>{
     Ok(secret)
 }
 
+//Modify one data from table secret
 pub fn update_secret(path: &str, secret: Secret) -> Result<(), String>{
     let conn = connection(path).unwrap();
     conn.execute("UPDATE secret SET message = ?1 WHERE id = ?2", 
@@ -108,6 +114,7 @@ pub fn update_secret(path: &str, secret: Secret) -> Result<(), String>{
     Ok(())
 }
 
+//Delete one data from table secret
 pub fn remove_secret(path: &str, id: String) -> Result<(), String>{
     let conn = connection(path).unwrap();
     conn.execute("DELETE FROM secret WHERE id = ?1", [id])
