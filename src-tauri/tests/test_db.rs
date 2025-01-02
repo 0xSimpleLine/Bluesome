@@ -42,8 +42,8 @@ mod test_db {
         update_secret(&db_name, _secret.clone()).unwrap();
         assert_eq!(_secret.message, "foo".to_string());
 
-        remove_secret(&db_name,_secrets.id).unwrap();
-        let _secrets = read_all_secret(&db_name).unwrap();
+        remove_secret(&db_name,_secret.id).unwrap();
+        let _secrets = read_all_secrets(&db_name).unwrap();
         assert_eq!(_secrets, vec![secret]);
 
         fs::remove_file(&db_name).unwrap();
