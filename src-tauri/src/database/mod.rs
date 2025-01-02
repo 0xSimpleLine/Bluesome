@@ -45,7 +45,7 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
     conn.execute_batch(
         "BEGIN;
         CREATE TABLE param (
-            id VARCHAR PRIMARY KEY UNIQUE,
+            id INT PRIMARY KEY UNIQUE,
             ad VARCHAR NOT NULL,
             salt1 VARCHAR NOT NULL,
             salt2 VARCHAR NOT NULL
