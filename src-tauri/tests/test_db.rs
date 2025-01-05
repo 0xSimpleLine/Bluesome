@@ -4,7 +4,6 @@
 mod test_db {
     use bluesome_lib::{database::*, types::*};
     use std::fs;
-    //use std::cmp::PartialEq;
    
     #[test]
     fn test_first_opt(){
