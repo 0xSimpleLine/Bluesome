@@ -23,7 +23,7 @@ pub fn generate_salts() -> Vec<Vec<u8>>{
     salts_final
 }
 
-pub fn derivate_key(password: &[u8], salt_1: [u8; 32], salt_2: [u8; 32]) -> Result<Vec<[u8; 32]>, String> {
+pub fn derivate_key(password: &[u8], salt_1: Vec<u8>, salt_2: Vec<u8>) -> Result<Vec<[u8; 32]>, String> {
     let (tx, rx) = mpsc::channel();
     let password = Arc::new(password.to_vec());
 

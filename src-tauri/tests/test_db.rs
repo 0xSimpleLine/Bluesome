@@ -8,10 +8,10 @@ mod test_db {
     #[test]
     fn test_first_opt(){
         let param = Param{
-            id: String::from("foo"),
-            ad: String::from("foo"),
-            salt1: String::from("foo"),
-            salt2: String::from("foo")
+            id: String::from("foo").into(),
+            ad: String::from("foo").into(),
+            salt1: String::from("foo").into(),
+            salt2: String::from("foo").into()
         };
 
         let secret = Secret{

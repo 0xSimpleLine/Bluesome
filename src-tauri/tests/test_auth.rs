@@ -25,7 +25,7 @@ mod test_auth{
     fn test_derivate_key(){
         let salts = generate_salts();
         let password = b"Kj8#mP9$vL2@nX4&hR5wQ7!cY3%bN";
-        let result = derivate_key(password, salts[0], salts[1]).unwrap();
+        let result = derivate_key(password, salts[0].clone(), salts[1].clone()).unwrap();
         assert_ne!(result, vec![[0u8;32], [0u8;32]]);
     }
 }
