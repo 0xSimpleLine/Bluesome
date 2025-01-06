@@ -7,16 +7,16 @@ use argon2::{
 use std::{thread, sync::{Arc, mpsc}};
 
 //Generated a slice with size of 32 bytes (256 bit)
-fn generate_rng_slice<R>(rng: &mut R) -> [u8; 32]
+fn generate_rng_slice<R>(rng: &mut R) -> Vec<u8>
     where 
         R: CryptoRng + RngCore,
 {
-    let mut new_random = [0u8; 32];
+    let mut new_random = vec![0u8; 32];
     rng.fill_bytes(&mut new_random);
     new_random
 }
 
-pub fn generate_salts() -> Vec<[u8; 32]>{
+pub fn generate_salts() -> Vec<Vec<u8>>{
     let salt_1 = generate_rng_slice(&mut OsRng);
     let salt_2 = generate_rng_slice(&mut OsRng);
     let salts_final = vec![salt_1, salt_2];

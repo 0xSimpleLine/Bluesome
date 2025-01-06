@@ -1,6 +1,7 @@
 //types
 use crate::processing::{decryption, encryption};
 use crate::utils::{decode_from_hex, encode_to_hex};
+use base64ct::{Base64, Encoding};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Param {
@@ -19,12 +20,12 @@ pub struct Secret {
 //Implement in type Param a constructor and some methods
 impl Param{
     //Create data and encrypt the field associated data (or ad) type of Param 
-    pub fn create(self, id: Vec<u8>, ad: Vec<u8>, salt1: Vec<u8>, salt2: Vec<u8>) -> Param{
+    pub fn create(id: Vec<u8>, ad: Vec<u8>, salt1: Vec<u8>, salt2: Vec<u8>) -> Param{
         Param{id, ad, salt1, salt2}
     }
 
     //Decode field from hex
-    pub fn decode_data(self, id: String, ad: String, salt1: String, salt2: String) -> Param{
+    pub fn decode(id: String, ad: String, salt1: String, salt2: String) -> Param{
         Param{
             id:  decode_from_hex(id).unwrap(),
             ad :  decode_from_hex(ad).unwrap(),
@@ -52,13 +53,13 @@ impl Param{
 //Implement in type secret a constructor and some methods
 impl Secret{
     //Create data and encrypt the field message type of Secret 
-    pub fn create(self, key: &[u8], ad: Vec<u8>, id: Vec<u8>, message: String) -> Secret{
+    pub fn create(key: &[u8], ad: Vec<u8>, id: Vec<u8>, message: String) -> Secret{
         //Encrypted the message
         let value_encrypted = encryption::encrypt_secret(key, 
             id.clone(),
             ad,
             message.into_bytes()).unwrap();
-        let message = String::from_utf8(value_encrypted).unwrap();
+        let message = Base64::encode_string(&value_encrypted);
 
         //Encode id (nonce) to hexadecimal
         let id = encode_to_hex(id);
@@ -71,7 +72,7 @@ impl Secret{
         let value_decrypted = decryption::decrypt_secret(key,
             decode_from_hex(self.id).unwrap(),
             ad,
-            self.message.into_bytes()).unwrap();
+            Base64::decode_vec(self.message.as_str()).unwrap()).unwrap();
 
         //convert the vector to String
         String::from_utf8(value_decrypted).unwrap()

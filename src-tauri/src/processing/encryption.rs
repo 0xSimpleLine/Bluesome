@@ -3,7 +3,6 @@ use aes_gcm::{
     Aes256Gcm, Key, Nonce
 };
 use argon2::password_hash::rand_core::{OsRng, CryptoRng, RngCore};
-use crate::utils::encode_to_hex;
 
 //Generated a slice with size of 12 bytes (96 bits)
 fn generate_rng_slice<R>(rng: &mut R) -> Vec<u8>
@@ -16,9 +15,8 @@ fn generate_rng_slice<R>(rng: &mut R) -> Vec<u8>
 }
 
 //Geneated the nonce to encrypt and decrypt data
-pub fn generate_nonce() -> String{
-    let nonce = generate_rng_slice(&mut OsRng);
-    encode_to_hex(nonce)
+pub fn generate_nonce() -> Vec<u8>{
+    generate_rng_slice(&mut OsRng)
 }
 
 // To encrypt data from database
