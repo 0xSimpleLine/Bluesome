@@ -2,7 +2,7 @@ use rusqlite::{Connection, Result, Error};
 use std::{fs, str};
 use sha2::{Sha256, Digest};
 use argon2::password_hash::rand_core::{OsRng, RngCore};
-use crate::auth::utils::encode_to_hex;
+use crate::utils::{encode_to_hex, decode_from_hex};
 use crate::types::*;
 
 fn hash_db_name(rng: &[u8]) -> String {
@@ -41,6 +41,12 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
     //Create db if don't exist
     let conn = connection(path).unwrap();
 
+    //encode the param data
+    let id = encode_to_hex(param.id);
+    let ad = encode_to_hex(param.ad);
+    let salt1 = encode_to_hex(param.salt1);
+    let salt2 = encode_to_hex(param.salt2);
+
     //Run command to create table 
     conn.execute_batch(
         "BEGIN;
@@ -60,7 +66,7 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
     //Insert data into table param
     conn.execute(
         "INSERT INTO param (id, ad, salt1, salt2) VALUES (?1, ?2, ?3, ?4)",
-        (param.id, param.ad, param.salt1, param.salt2),
+        (id, ad, salt1, salt2),
     ).expect("Impossible to stock data");
     conn.close().unwrap();
     Ok(())
