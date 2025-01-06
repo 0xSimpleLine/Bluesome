@@ -2,7 +2,7 @@ use rusqlite::{Connection, Result, Error};
 use std::{fs, str};
 use sha2::{Sha256, Digest};
 use argon2::password_hash::rand_core::{OsRng, RngCore};
-use crate::utils::{encode_to_hex, decode_from_hex};
+use crate::utils::{encode_to_hex};
 use crate::types::*;
 
 fn hash_db_name(rng: &[u8]) -> String {
