@@ -1,6 +1,6 @@
 //types
 use crate::processing::{decryption, encryption};
-use crate::utils::decode_from_hex;
+use crate::utils::{decode_from_hex, encode_to_hex};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Param {
@@ -52,31 +52,28 @@ impl Param{
 //Implement in type secret a constructor and some methods
 impl Secret{
     //Create data and encrypt the field message type of Secret 
-    pub fn new(self, key: &[u8], ad: &[u8], id: String, message: String) -> Secret{
+    pub fn create(self, key: &[u8], ad: Vec<u8>, id: Vec<u8>, message: String) -> Secret{
+        //Encrypted the message
         let value_encrypted = encryption::encrypt_secret(key, 
-            decode_from_base64(id.clone()).unwrap(),
+            id.clone(),
             ad,
-            message.as_bytes().to_vec()).unwrap();
+            message.into_bytes()).unwrap();
         let message = String::from_utf8(value_encrypted).unwrap();
+
+        //Encode id (nonce) to hexadecimal
+        let id = encode_to_hex(id);
         Secret{id, message}
-    }
-    
-    //Encrypt the field message in using ad from type Param and key
-    pub fn encrypt(&mut self, key: &[u8], ad: &[u8]) -> &mut Secret{
-        let value_encrypted = encryption::encrypt_secret(key, 
-            decode_from_base64(self.id.clone()).unwrap(),
-            ad,
-            self.message.as_bytes().to_vec()).unwrap();
-        self.message = String::from_utf8(value_encrypted).unwrap();
-        self
     }
 
     //Decrypt the field message in using ad from type Param and key
-    pub fn decrypt(self, key: &[u8], ad: &[u8]) -> String{
+    pub fn decrypt(self, key: &[u8], ad: Vec<u8>) -> String{
+        //decrypted the message
         let value_decrypted = decryption::decrypt_secret(key,
-            decode_from_base64(self.id.clone()).unwrap(),
+            decode_from_hex(self.id).unwrap(),
             ad,
-            self.message.as_bytes().to_vec()).unwrap();
+            self.message.into_bytes()).unwrap();
+
+        //convert the vector to String
         String::from_utf8(value_decrypted).unwrap()
     }
 }
