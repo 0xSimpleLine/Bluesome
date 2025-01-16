@@ -16,6 +16,7 @@ fn generate_rng_slice<R>(rng: &mut R) -> Vec<u8>
     new_random
 }
 
+//Generated 2 salts in 32 bytes
 pub fn generate_salts() -> Vec<Vec<u8>>{
     let salt_1 = generate_rng_slice(&mut OsRng);
     let salt_2 = generate_rng_slice(&mut OsRng);
@@ -23,6 +24,7 @@ pub fn generate_salts() -> Vec<Vec<u8>>{
     salts_final
 }
 
+//Derivated Key in Argon2
 pub fn derivate_key(password: &[u8], salt_1: Vec<u8>, salt_2: Vec<u8>) -> Result<Vec<[u8; 32]>, String> {
     let (tx, rx) = mpsc::channel();
     let password = Arc::new(password.to_vec());

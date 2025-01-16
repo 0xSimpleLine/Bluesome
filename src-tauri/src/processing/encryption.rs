@@ -4,7 +4,7 @@ use aes_gcm::{
 };
 use argon2::password_hash::rand_core::{OsRng, CryptoRng, RngCore};
 
-//Generated a slice with size of 12 bytes (96 bits)
+//Generate a slice with size of 12 bytes (96 bits)
 fn generate_rng_slice<R>(rng: &mut R) -> Vec<u8>
     where 
         R: CryptoRng + RngCore,
@@ -14,12 +14,12 @@ fn generate_rng_slice<R>(rng: &mut R) -> Vec<u8>
     new_random
 }
 
-//Geneated the nonce to encrypt and decrypt data
+//Geneate nonce to encrypt and decrypt data
 pub fn generate_nonce() -> Vec<u8>{
     generate_rng_slice(&mut OsRng)
 }
 
-// To encrypt data from database
+//encrypt secret from database
 pub fn encrypt_secret(key: &[u8], nonce: Vec<u8>, ad: Vec<u8>, plaint_text: Vec<u8>) -> Result<Vec<u8>, String> {
     let mut cipher_text = plaint_text;
     let key = Key::<Aes256Gcm>::from_slice(key);
@@ -29,7 +29,7 @@ pub fn encrypt_secret(key: &[u8], nonce: Vec<u8>, ad: Vec<u8>, plaint_text: Vec<
     Ok(cipher_text)
 }
 
-// To encrypt params from database
+//encrypt params from database
 pub fn encrypt_params(key: &[u8], nonce: Vec<u8>, plaint_text: Vec<u8>) -> Result<Vec<u8>, String> {
     let key = Key::<Aes256Gcm>::from_slice(key);
     let nonce = Nonce::from_slice(nonce.as_slice());

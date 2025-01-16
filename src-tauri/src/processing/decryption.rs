@@ -3,7 +3,7 @@ use aes_gcm::{
     Aes256Gcm, Key, Nonce
 };
 
-// To decrypt data from database
+// decrypt secret from database
 pub fn decrypt_secret(key: &[u8], nonce: Vec<u8>, ad: Vec<u8>, cipher_text: Vec<u8>) -> Result<Vec<u8>, String>{
     let mut plaint_text = cipher_text;
     let key = Key::<Aes256Gcm>::from_slice(key);
@@ -13,7 +13,7 @@ pub fn decrypt_secret(key: &[u8], nonce: Vec<u8>, ad: Vec<u8>, cipher_text: Vec<
     Ok(plaint_text)
 }
 
-// To decrypt params from database
+// decrypt params from database
 pub fn decrypt_params(key: &[u8], nonce: Vec<u8>, cipher_text: Vec<u8>) -> Result<Vec<u8>, String>{
     let key = Key::<Aes256Gcm>::from_slice(key);
     let nonce = Nonce::from_slice(nonce.as_slice());
