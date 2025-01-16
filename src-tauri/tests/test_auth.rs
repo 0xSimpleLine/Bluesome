@@ -10,15 +10,15 @@ mod test_auth{
     fn hash_password_test(){
         //Phase 1
         let data_1 = "hello world".to_string(); 
-        let trust_result_1 = hex!("b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9");
-        let result_1 = verify_password(data_1.clone(), Base64::encode_string(&trust_result_1)).unwrap();
-        assert_eq!(result_1, data_1);
+        let trust_result_1 = Base64::encode_string(&hex!("b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"));
+        let result_1 = verify_password(hash(&data_1), trust_result_1.clone()).unwrap();
+        assert_eq!(trust_result_1, result_1);
 
         //Phase 2
         let data_2 = "de188941a3375d3a8a061e67576e926d".to_string();
-        let trust_result_2 = hex!("57e918cfef3bd4ecd82e1e01771a60efa713df3d3281f61c785b7f7920e853b7");
-        let result_2 = verify_password(data_2.clone(), Base64::encode_string(&trust_result_2)).unwrap();
-        assert_eq!(result_2, data_2);
+        let trust_result_2 = Base64::encode_string(&hex!("57e918cfef3bd4ecd82e1e01771a60efa713df3d3281f61c785b7f7920e853b7"));
+        let result_2 = verify_password(hash(&data_2), trust_result_2.clone()).unwrap();
+        assert_eq!(trust_result_2, result_2);
     }
 
     #[test]
