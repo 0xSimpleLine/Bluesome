@@ -15,9 +15,14 @@ jobs:
       matrix:
         os: [ubuntu-lastest, windows-latest, macos-latest]
     runs-on: ${{matrix.os}}
-
+    
     steps:
     - uses: actions/checkout@v4
+
+    - name: Setup Rust toolchain
+      working-directory: ./src-tauri
+      run: rustup toolchain install stable --profile minimal
+      
 
     - name: Build
       working-directory: ./src-tauri
