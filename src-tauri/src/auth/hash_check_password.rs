@@ -1,6 +1,8 @@
 // hash_check_password is a module who inclue all function to hash and verify
 // the user's password
 
+use std::fs;
+use crate::utils::{generate_file};
 use sha2::{Sha256, Digest};
 use base64ct::{Base64, Encoding};
 
@@ -10,6 +12,20 @@ pub fn hash(password: &String) -> String{
     Base64::encode_string(&hasher)
 } 
 
+//Stock password in file
+pub fn stock_password(password: String) -> Result<(), String>{
+    match generate_file("file.txt", password){
+        Ok(v) => Ok(v),
+        Err(e) => Err(e)
+    }
+}
+
+//Read file and return his content
+pub fn read_file() -> Result<String, String>{
+    let content = fs::read_to_string("file.txt")
+        .expect("Impossible to read file");
+    Ok(content)
+}
 
 // This function allow to verify if the password is correct
 // and protect against the contant time attacks

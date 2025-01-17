@@ -2,29 +2,29 @@ use rusqlite::{Connection, Result, Error};
 use std::{fs, str};
 use sha2::{Sha256, Digest};
 use argon2::password_hash::rand_core::{OsRng, RngCore};
-use crate::utils::{encode_to_hex};
+use crate::utils::{encode_to_hex, generate_file};
 use crate::types::*;
 
+//Hash a random value and convert to hex
 fn hash_db_name(rng: &[u8]) -> String {
     let hasher = Sha256::digest(rng);
     return encode_to_hex(hasher[..10].to_vec());
 }
 
-//This function generate a random slice and stock the name in file txt
-pub fn generate_db_name() -> Result<(), String>{
+//Genereate one file and include the db name
+pub fn generate_db_name() -> Result<(), String> {
     //Generate a random data
     let mut rand_slice = [0u8; 16];
     OsRng.fill_bytes(&mut rand_slice);
     let mut db_name = hash_db_name(&rand_slice); 
     db_name.push_str(".sqlite3");
-
-    //Create file "file.txt" and write databse
-    fs::write("db_file.txt", db_name)
-        .expect("Impossible to write in file");
-    Ok(())
+    match generate_file("db_file.txt", db_name){
+        Ok(v) => Ok(v),
+        Err(e) => Err(e)
+    }
 }
 
-//Read DB File and return his content
+//Read DB file and return his content
 pub fn read_db_file() -> Result<String, String>{
     let content = fs::read_to_string("db_file.txt")
         .expect("Impossible to read file");
@@ -47,7 +47,7 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
     let salt1 = encode_to_hex(param.salt1);
     let salt2 = encode_to_hex(param.salt2);
 
-    //Run command to create table 
+    //Run request to create table 
     conn.execute_batch(
         "BEGIN;
         CREATE TABLE param (
