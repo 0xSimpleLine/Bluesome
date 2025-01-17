@@ -5,18 +5,25 @@ use aes_gcm::{
 use argon2::password_hash::rand_core::{OsRng, CryptoRng, RngCore};
 
 //Generate a slice with size of 12 bytes (96 bits)
-fn generate_rng_slice<R>(rng: &mut R) -> Vec<u8>
+fn generate_rng_slice<R>(rng: &mut R, new_random: &mut Vec<u8>)
     where 
         R: CryptoRng + RngCore,
 {
-    let mut new_random = vec![0u8; 12];
-    rng.fill_bytes(&mut new_random);
-    new_random
+    rng.fill_bytes(new_random);
 }
 
-//Geneate nonce to encrypt and decrypt data
+//Geneate nonce for encrypting and decrypting data
 pub fn generate_nonce() -> Vec<u8>{
-    generate_rng_slice(&mut OsRng)
+    let mut new_random = vec![0u8; 12];
+    generate_rng_slice(&mut OsRng, &mut new_random);
+    return new_random;
+}
+
+//Generate an AD for encrypting and decrypting data
+pub fn generate_ad() -> Vec<u8> {
+    let mut new_random = vec![0u8; 32];
+    generate_rng_slice(&mut OsRng, &mut new_random);
+    return new_random;
 }
 
 //encrypt secret from database
