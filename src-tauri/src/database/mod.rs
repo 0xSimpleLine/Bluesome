@@ -58,6 +58,7 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
         );
         CREATE TABLE secret (
             id VARCHAR PRIMARY KEY UNIQUE,
+            title VARCHAR,
             message VARCHAR NOT NULL
         );
         COMMIT;"
@@ -76,8 +77,8 @@ pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
 pub fn create_new_secret(path: &str, secret: Secret) -> Result<(), String> {
     let conn = connection(path).unwrap();
     conn.execute(
-        "INSERT INTO secret (id, message) VALUES (?1, ?2)",
-        (secret.id, secret.message)
+        "INSERT INTO secret (id, title, message) VALUES (?1, ?2, ?3)",
+        (secret.id, secret.title, secret.message)
     ).expect("Impossible to stock secret");
     conn.close().unwrap();
     Ok(())
@@ -86,12 +87,13 @@ pub fn create_new_secret(path: &str, secret: Secret) -> Result<(), String> {
 //Read all data from table secret
 pub fn read_all_secrets(path: &str) -> Result<Vec<Secret>, Error> {
     let conn = connection(path).unwrap();
-    let mut stmt = conn.prepare("SELECT id, message FROM secret")
+    let mut stmt = conn.prepare("SELECT id, title, message FROM secret")
         .expect("Impossible to read all secrets");
     let rows = stmt.query_map([], |row| {
         Ok(Secret {
             id: row.get(0)?,
-            message: row.get(1)?
+            title: row.get(1)?,
+            message: row.get(2)?
         })})?;
     let mut messages: Vec<Secret> = Vec::new();
     for row in rows{
@@ -104,7 +106,7 @@ pub fn read_all_secrets(path: &str) -> Result<Vec<Secret>, Error> {
 //Read one data from table secret 
 pub fn read_secret(path: &str, id: &str) -> Result<String, String>{
     let conn = connection(path).unwrap();
-    let secret = conn.query_row("SELECT message FROM secret WHERE id = ?1",
+    let secret = conn.query_row("SELECT title, message FROM secret WHERE id = ?1",
         [id],
         |row| row.get(0)).expect("Impossible to read secret");
     conn.close().unwrap();
@@ -114,8 +116,8 @@ pub fn read_secret(path: &str, id: &str) -> Result<String, String>{
 //Modify one data from table secret
 pub fn update_secret(path: &str, secret: Secret) -> Result<(), String>{
     let conn = connection(path).unwrap();
-    conn.execute("UPDATE secret SET message = ?1 WHERE id = ?2", 
-        [secret.message, secret.id]).expect("Impossible to modify this secret");
+    conn.execute("UPDATE secret SET title = ?1, message = ?2 WHERE id = ?3", 
+        [secret.title, secret.message, secret.id]).expect("Impossible to modify this secret");
     conn.close().unwrap();
     Ok(())
 }

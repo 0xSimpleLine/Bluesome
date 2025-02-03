@@ -14,6 +14,7 @@ pub struct Param {
 #[derive(Debug, PartialEq, Clone)]
 pub struct Secret {
     pub id: String,
+    pub title: String,
     pub message: String
 }
 
@@ -53,7 +54,7 @@ impl Param{
 //Implement in type secret a constructor and some methods
 impl Secret{
     //Create data and encrypt the field message type of Secret 
-    pub fn create(key: &[u8], ad: Vec<u8>, id: Vec<u8>, message: String) -> Secret{
+    pub fn create(key: &[u8], ad: Vec<u8>, id: Vec<u8>, title: String, message: String) -> Secret{
         //Encrypted the message
         let value_encrypted = encryption::encrypt_secret(key, 
             id.clone(),
@@ -63,7 +64,7 @@ impl Secret{
 
         //Encode id (nonce) to hexadecimal
         let id = encode_to_hex(id);
-        Secret{id, message}
+        Secret{id, title, message}
     }
 
     //Decrypt the field message in using ad from type Param and key

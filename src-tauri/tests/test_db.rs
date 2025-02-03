@@ -16,11 +16,13 @@ mod test_db {
 
         let secret = Secret{
             id: String::from("foo"),
+            title: String::from("foo"), 
             message: String::from("foo")
         };
 
         let mut _secret = Secret{
             id: String::from("bar"),
+            title: String::from("bar"), 
             message: String::from("bar")
         };
 
@@ -38,7 +40,9 @@ mod test_db {
         assert_eq!(secret_, secret.message);
 
         _secret.message = "foo".to_string();
+        _secret.title = "foo".to_string();
         update_secret(&db_name, _secret.clone()).unwrap();
+        assert_eq!(_secret.title, "foo".to_string());
         assert_eq!(_secret.message, "foo".to_string());
 
         remove_secret(&db_name,_secret.id).unwrap();
