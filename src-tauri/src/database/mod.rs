@@ -18,10 +18,8 @@ pub fn generate_db_name() -> Result<(), String> {
     OsRng.fill_bytes(&mut rand_slice);
     let mut db_name = hash_db_name(&rand_slice); 
     db_name.push_str(".sqlite3");
-    match generate_file("db_file.txt", db_name){
-        Ok(v) => Ok(v),
-        Err(e) => Err(e)
-    }
+    generate_file("db_file.txt", db_name).unwrap();
+    return Ok(());
 }
 
 //Read DB file and return his content

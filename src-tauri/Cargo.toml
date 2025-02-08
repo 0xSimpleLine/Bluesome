@@ -30,3 +30,9 @@ rustc-serialize = "0.3.25"
 hex-literal = "0.4.1"
 base64ct = "1.6.0"
 rusqlite = "0.32.1"
+criterion = "0.5.1"
+
+[[bench]]
+name = "db_bench"
+path = "./benches/db_bench.rs"
+harness = false

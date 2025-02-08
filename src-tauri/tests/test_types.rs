@@ -23,7 +23,7 @@ mod test_types{
         let ad_hex = encode_to_hex(ad.clone());
 
         // Create data with type 
-        let mut param = Param::create(nonce.clone(), ad.to_vec(), salts[0].clone(), salts[1].clone());
+        let mut param = Param::create(nonce.clone(), ad.clone(), salts[0].clone(), salts[1].clone());
         param.encrypt(&KEY);
         //Verify if ad is encrypted correctly
         assert_ne!(ad, param.ad);
