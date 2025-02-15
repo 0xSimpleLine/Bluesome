@@ -1,4 +1,4 @@
-use rusqlite::{Connection, Result, Error};
+use rusqlite::{Connection, Result, Error, params};
 use std::{fs, str};
 use sha2::{Sha256, Digest};
 use argon2::password_hash::rand_core::{OsRng, RngCore};
@@ -31,54 +31,62 @@ pub fn read_db_file() -> Result<String, String>{
 
 //get the content of db file to connect to database or create new database if don't exist
 fn connection(path: &str) -> Result<Connection, String> {
-  let db = Connection::open(path).expect("Impossible to connect in database");  Ok(db)
+  let db = Connection::open(path).expect("Impossible to connect in database");  
+  db.execute_batch("
+        PRAGMA synchronous = FULL;
+        PRAGMA journal_mode = WAL;
+        PRAGMA temp_store = MEMORY;
+      ").unwrap();
+  Ok(db)
 }
 
 //create db, tables and insert data for table param
-pub fn create_db_tables(path: &str, param: Param) -> Result<(), String> {
-    //Create db if don't exist
-    let conn = connection(path).unwrap();
+pub fn create_db_tables(path: &str) -> Result<(), String> {
+    let mut conn = connection(path).unwrap();
+    let tx = conn.transaction().unwrap();
 
+    //Run request to create table 
+    tx.execute_batch(
+        "CREATE TABLE param (
+            id VARCHAR PRIMARY KEY UNIQUE,
+            ad VARCHAR NOT NULL,
+            salt1 VARCHAR NOT NULL,
+            salt2 VARCHAR NOT NULL
+        );
+
+        CREATE TABLE secret (
+            id VARCHAR PRIMARY KEY UNIQUE,
+            title VARCHAR,
+            message VARCHAR NOT NULL
+        );"
+    ).expect("Impossible to create tables");
+    tx.commit().unwrap();
+    Ok(())
+}
+
+//Insert data in table Param
+pub fn insert_data_param(path: &str, param: Param) -> Result<(), String>{
+    let conn = connection(path).unwrap();
     //encode the param data
     let id = encode_to_hex(param.id);
     let ad = encode_to_hex(param.ad);
     let salt1 = encode_to_hex(param.salt1);
     let salt2 = encode_to_hex(param.salt2);
 
-    //Run request to create table 
-    conn.execute_batch(
-        "BEGIN;
-        CREATE TABLE param (
-            id VARCHAR PRIMARY KEY UNIQUE,
-            ad VARCHAR NOT NULL,
-            salt1 VARCHAR NOT NULL,
-            salt2 VARCHAR NOT NULL
-        );
-        CREATE TABLE secret (
-            id VARCHAR PRIMARY KEY UNIQUE,
-            title VARCHAR,
-            message VARCHAR NOT NULL
-        );
-        COMMIT;"
-    ).expect("Impossible to create tables");
-
     //Insert data into table param
-    conn.execute(
+    conn.prepare(
         "INSERT INTO param (id, ad, salt1, salt2) VALUES (?1, ?2, ?3, ?4)",
-        (id, ad, salt1, salt2),
-    ).expect("Impossible to stock data");
-    conn.close().unwrap();
+    ).unwrap().execute(params![id, ad, salt1, salt2]).expect("Impossible to insert data");
     Ok(())
 }
 
-//Insert data in table secret
-pub fn create_new_secret(path: &str, secret: Secret) -> Result<(), String> {
+//Insert data in table Secret
+pub fn insert_new_secret(path: &str, secret: Secret) -> Result<(), String> {
     let conn = connection(path).unwrap();
     conn.execute(
         "INSERT INTO secret (id, title, message) VALUES (?1, ?2, ?3)",
         (secret.id, secret.title, secret.message)
-    ).expect("Impossible to stock secret");
-    conn.close().unwrap();
+    ).expect("Impossible to insert data");
     Ok(())
 }
 
@@ -107,7 +115,6 @@ pub fn read_secret(path: &str, id: &str) -> Result<String, String>{
     let secret = conn.query_row("SELECT title, message FROM secret WHERE id = ?1",
         [id],
         |row| row.get(0)).expect("Impossible to read secret");
-    conn.close().unwrap();
     Ok(secret)
 }
 
@@ -116,7 +123,6 @@ pub fn update_secret(path: &str, secret: Secret) -> Result<(), String>{
     let conn = connection(path).unwrap();
     conn.execute("UPDATE secret SET title = ?1, message = ?2 WHERE id = ?3", 
         [secret.title, secret.message, secret.id]).expect("Impossible to modify this secret");
-    conn.close().unwrap();
     Ok(())
 }
 
@@ -125,6 +131,13 @@ pub fn remove_secret(path: &str, id: String) -> Result<(), String>{
     let conn = connection(path).unwrap();
     conn.execute("DELETE FROM secret WHERE id = ?1", [id])
         .expect("Impossible to delete this secret");
-    conn.close().unwrap();
     Ok(())
 }
+
+/*
+pub fn close(self) -> Result<(), String>{
+    self.conn.execute_batch("
+        ANALYSE;
+        PRAGMA optimize;
+        ").expect("Impossible to close the connection");
+} */
