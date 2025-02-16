@@ -27,26 +27,27 @@ mod test_db {
         };
 
         generate_db_name().unwrap();
-        let db_name = read_db_file().unwrap();
+        let db_name = read_db_file("db_file.txt").unwrap();
 
-        create_db_tables(&db_name, param).unwrap();
-        create_new_secret(&db_name, secret.clone()).unwrap();
-        create_new_secret(&db_name, _secret.clone()).unwrap();
+        let mut db = DBManager::open(&db_name).unwrap();
+        db.create_tables().unwrap();
+        db.insert_data_secret(secret.clone()).unwrap();
+        db.insert_data_secret(secret.clone()).unwrap();
 
-        let secrets = read_all_secrets(&db_name).unwrap();
-        let secret_ = read_secret(&db_name, "foo").unwrap();
+        let secrets = db.read_all_secrets().unwrap();
+        let secret_ = db.read_secret( "foo").unwrap();
 
         assert_eq!(secrets, vec![secret.clone(), _secret.clone()]);
         assert_eq!(secret_, secret.message);
 
         _secret.message = "foo".to_string();
         _secret.title = "foo".to_string();
-        update_secret(&db_name, _secret.clone()).unwrap();
+        db.update_secret(secret.clone()).unwrap();
         assert_eq!(_secret.title, "foo".to_string());
         assert_eq!(_secret.message, "foo".to_string());
 
-        remove_secret(&db_name,_secret.id).unwrap();
-        let _secrets = read_all_secrets(&db_name).unwrap();
+        db.remove_secret(secret.id.clone()).unwrap();
+        let _secrets = db.read_all_secrets().unwrap();
         assert_eq!(_secrets, vec![secret]);
 
         fs::remove_file(&db_name).unwrap();
