@@ -27,19 +27,19 @@ pub fn generate_ad() -> Vec<u8> {
 }
 
 //encrypt secret from database
-pub fn encrypt_secret(key: &[u8], nonce: Vec<u8>, ad: Vec<u8>, plaint_text: Vec<u8>) -> Result<Vec<u8>, String> {
+pub fn encrypt_secret(key: &[u8], nonce: &[u8], ad: &[u8], plaint_text: Vec<u8>) -> Result<Vec<u8>, String> {
     let mut cipher_text = plaint_text;
     let key = Key::<Aes256Gcm>::from_slice(key);
-    let nonce = Nonce::from_slice(nonce.as_slice());
+    let nonce = Nonce::from_slice(nonce);
     let cipher = Aes256Gcm::new(key);
-    cipher.encrypt_in_place(nonce, ad.as_slice(), &mut cipher_text).expect("Encryption failed");
+    cipher.encrypt_in_place(nonce, ad, &mut cipher_text).expect("Encryption failed");
     Ok(cipher_text)
 }
 
 //encrypt params from database
-pub fn encrypt_params(key: &[u8], nonce: Vec<u8>, plaint_text: Vec<u8>) -> Result<Vec<u8>, String> {
+pub fn encrypt_params(key: &[u8], nonce: &[u8], plaint_text: Vec<u8>) -> Result<Vec<u8>, String> {
     let key = Key::<Aes256Gcm>::from_slice(key);
-    let nonce = Nonce::from_slice(nonce.as_slice());
+    let nonce = Nonce::from_slice(nonce);
     let cipher = Aes256Gcm::new(key);
     let cipher_text = cipher.encrypt(nonce, plaint_text.as_ref()).expect("Encryption failed");
     Ok(cipher_text)

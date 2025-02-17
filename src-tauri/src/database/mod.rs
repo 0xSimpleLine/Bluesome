@@ -32,7 +32,6 @@ pub fn read_db_file(path: &str) -> Result<String> {
 pub struct DBManager{
     pub conn: Connection
 }
-
 impl DBManager{
 
     //get the content of db file to connect to database or create new database if don't exist
@@ -52,14 +51,14 @@ impl DBManager{
 
         //Run request to create table 
         tx.execute_batch(
-            "CREATE TABLE param (
+            "CREATE TABLE IF NOT EXISTS param (
                 id VARCHAR PRIMARY KEY UNIQUE,
                 ad VARCHAR NOT NULL,
                 salt1 VARCHAR NOT NULL,
                 salt2 VARCHAR NOT NULL
             );
 
-            CREATE TABLE secret (
+            CREATE TABLE IF NOT EXISTS secret (
                 id VARCHAR PRIMARY KEY UNIQUE,
                 title VARCHAR,
                 message VARCHAR NOT NULL
@@ -70,26 +69,22 @@ impl DBManager{
     }
 
     //Insert data in table Param
-    pub fn insert_data_param(&self, param: Param) -> Result<()>{
-        //encode the param data
-        let id = encode_to_hex(param.id);
-        let ad = encode_to_hex(param.ad);
-        let salt1 = encode_to_hex(param.salt1);
-        let salt2 = encode_to_hex(param.salt2);
-
+    pub fn insert_data_param(&self, param_hex: ParamHex) -> Result<()>{
         //Insert data into table param
         self.conn.prepare(
-            "INSERT INTO param (id, ad, salt1, salt2) VALUES (?1, ?2, ?3, ?4)",
-        ).unwrap().execute(params![id, ad, salt1, salt2])?;
+            "INSERT INTO param (id, ad, salt1, salt2) VALUES (?1, ?2, ?3, ?4)",).unwrap().execute(params![param_hex.id, 
+            param_hex.ad, 
+            param_hex.salt1,
+            param_hex.salt2])?;
         Ok(())
     }
 
     //Insert data in table Secret
     pub fn insert_data_secret(&self, secret: Secret) -> Result<()> {
-        self.conn.execute(
-            "INSERT INTO secret (id, title, message) VALUES (?1, ?2, ?3)",
-            (secret.id, secret.title, secret.message)
-        )?;
+        self.conn.prepare(
+            "INSERT INTO secret (id, title, message) VALUES (?1, ?2, ?3)",).unwrap().execute(params![secret.id, 
+            secret.title, 
+            secret.message])?;
         Ok(())
     }
 
@@ -131,13 +126,4 @@ impl DBManager{
         self.conn.execute("DELETE FROM secret WHERE id = ?1", [id])?;
         Ok(())
     }
-
-    //Close the connection with database
-    pub fn close(&self) -> Result<()>{
-        self.conn.execute_batch("
-            ANALYSE;
-            PRAGMA optimize;
-            ")?;
-        Ok(())
-    } 
 }

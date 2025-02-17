@@ -31,8 +31,9 @@ mod test_db {
 
         let mut db = DBManager::open(&db_name).unwrap();
         db.create_tables().unwrap();
+        db.insert_data_param(param.clone()).unwrap();
         db.insert_data_secret(secret.clone()).unwrap();
-        db.insert_data_secret(secret.clone()).unwrap();
+        db.insert_data_secret(_secret.clone()).unwrap();
 
         let secrets = db.read_all_secrets().unwrap();
         let secret_ = db.read_secret( "foo").unwrap();
@@ -46,9 +47,10 @@ mod test_db {
         assert_eq!(_secret.title, "foo".to_string());
         assert_eq!(_secret.message, "foo".to_string());
 
-        db.remove_secret(secret.id.clone()).unwrap();
+        db.remove_secret(_secret.id.clone()).unwrap();
         let _secrets = db.read_all_secrets().unwrap();
         assert_eq!(_secrets, vec![secret]);
+        db.conn.close().unwrap();
 
         fs::remove_file(&db_name).unwrap();
         fs::remove_file("db_file.txt").unwrap();
