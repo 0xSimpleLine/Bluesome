@@ -57,9 +57,13 @@ fn bench(c: &mut Criterion) {
         b.iter(|| update_secret(black_box("test.sqlite3"), black_box(secret.clone())))});
 
     c.bench_function("remove data", |b| b.iter(|| remove_secret(black_box("test.sqlite3"), black_box(encode_to_hex(nonce_secret.clone())))));
-
-    //fs::remove_file("test.sqlite3").unwrap();
-    //fs::remove_file("db_file.txt").unwrap();*/
+*/
+    fs::remove_file("bench.sqlite3").unwrap();
+    fs::remove_file("bench.sqlite3-shm").unwrap();
+    fs::remove_file("bench.sqlite3-wal").unwrap();
+    fs::remove_file("bench_local.sqlite3-shm").unwrap();
+    fs::remove_file("bench_local.sqlite3-wal").unwrap();
+    fs::remove_file("db_file.txt").unwrap();
 }
 
 criterion_group!(benches, bench);

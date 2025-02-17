@@ -34,18 +34,18 @@ mod test_processing{
         let cipher_text_2 = decode_from_hex("522dc1f099567d07f47f37a32a84427d643a8cdcbfe5c0c97598a2bd2555d1aa8cb08e48590dbb3da7b08b1056828838c5f61e6393ba7a0abcc9f662898015adb094dac5d93471bdec1a502270e3cc6c".to_string()).unwrap();
 
         //Phase 1
-        let result_encrypt = encrypt_params(key_1.as_slice(), nonce_1.clone(), plaint_text_1).unwrap();
+        let result_encrypt = encrypt_params(key_1.as_slice(), &nonce_1, plaint_text_1).unwrap();
         assert_eq!(encode_to_hex(result_encrypt), tag_1.to_string());
 
-        let result_encrypt = encrypt_params(key_2.as_slice(), nonce_2.clone(), plaint_text_2).unwrap();
+        let result_encrypt = encrypt_params(key_2.as_slice(), &nonce_2, plaint_text_2).unwrap();
         assert_eq!(encode_to_hex(result_encrypt), format!("{}{}", cipher_text_1, tag_3));
 
         // Phase 2
-        let result_1 = decrypt_params(key_1.as_slice(), nonce_1, tag_2).unwrap();
+        let result_1 = decrypt_params(key_1.as_slice(), &nonce_1, tag_2).unwrap();
         assert_eq!(encode_to_hex(result_1), "");
 
         // Phase 3 
-        let result_2 = decrypt_params(key_2.as_slice(), nonce_2, cipher_text_2).unwrap();
+        let result_2 = decrypt_params(key_2.as_slice(), &nonce_2, cipher_text_2).unwrap();
         assert_eq!(encode_to_hex(result_2), plaint_text_3.to_string());
     }
 
@@ -86,19 +86,19 @@ mod test_processing{
 
         //Assertion
         // Phase 1
-        let result_1 = encrypt_secret(key_1.as_slice(), nonce_1.clone(), ad_1.clone(), plaint_text_1).unwrap();
+        let result_1 = encrypt_secret(key_1.as_slice(), &nonce_1, &ad_1, plaint_text_1).unwrap();
         assert_eq!(encode_to_hex(result_1), format!("{}{}", cipher_text_1, tag_1));
 
         // Phase 2
-        let result_2 = encrypt_secret(key_2.as_slice(), nonce_2.clone(), ad_2.clone(), plaint_text_2).unwrap();
+        let result_2 = encrypt_secret(key_2.as_slice(), &nonce_2, &ad_2, plaint_text_2).unwrap();
         assert_eq!(encode_to_hex(result_2), format!("{}{}", cipher_text_2, tag_2));
     
         // Phase 3
-        let result_3 = decrypt_secret(key_1.as_slice(), nonce_1, ad_1, cipher_text_3).unwrap();
+        let result_3 = decrypt_secret(key_1.as_slice(), &nonce_1, &ad_1, cipher_text_3).unwrap();
         assert_eq!(encode_to_hex(result_3), format!("{}", plaint_text_3));
 
         // Phase 4
-        let result_2 = decrypt_secret(key_2.as_slice(), nonce_2, ad_2, cipher_text_4).unwrap();
+        let result_2 = decrypt_secret(key_2.as_slice(), &nonce_2, &ad_2, cipher_text_4).unwrap();
         assert_eq!(encode_to_hex(result_2), format!("{}", plaint_text_4));
     }
 }

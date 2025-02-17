@@ -81,8 +81,8 @@ impl Secret{
     pub fn create(key: &[u8], id:Vec<u8>, ad:Vec<u8>, title: String, message: String) -> Secret{
         //Encrypted the message
         let value_encrypted = encryption::encrypt_secret(key, 
-            id.as_slice(),
-            ad.as_slice(),
+            &id,
+            &ad,
             message.into_bytes()).unwrap();
         let message = Base64::encode_string(&value_encrypted);
 

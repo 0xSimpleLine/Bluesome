@@ -7,7 +7,7 @@ mod test_db {
    
     #[test]
     fn test_first_opt(){
-        let param = Param{
+        let param_hex = ParamHex{
             id: String::from("foo").into(),
             ad: String::from("foo").into(),
             salt1: String::from("foo").into(),
@@ -31,7 +31,7 @@ mod test_db {
 
         let mut db = DBManager::open(&db_name).unwrap();
         db.create_tables().unwrap();
-        db.insert_data_param(param.clone()).unwrap();
+        db.insert_data_param(param_hex).unwrap();
         db.insert_data_secret(secret.clone()).unwrap();
         db.insert_data_secret(_secret.clone()).unwrap();
 
@@ -53,6 +53,8 @@ mod test_db {
         db.conn.close().unwrap();
 
         fs::remove_file(&db_name).unwrap();
+        //fs::remove_file(format!("{:?}-shm", db_name)).unwrap();
+        //fs::remove_file(format!("{:?}-wal", db_name)).unwrap();
         fs::remove_file("db_file.txt").unwrap();
     }
 }

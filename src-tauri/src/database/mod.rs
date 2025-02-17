@@ -38,9 +38,9 @@ impl DBManager{
     pub fn open(path: &str) -> Result<DBManager> {
       let db = Connection::open(path)?;  
       db.execute_batch("
-            PRAGMA synchronous = FULL;
+            PRAGMA synchronous = NORMAL;
             PRAGMA journal_mode = WAL;
-            PRAGMA temp_store = MEMORY;
+            PRAGMA temp_store = DEFAULT;
           ").unwrap();
       Ok(DBManager{conn:db})
     }
