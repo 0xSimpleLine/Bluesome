@@ -98,11 +98,10 @@ impl DBManager{
                 title: row.get(1)?,
                 message: row.get(2)?
             })})?;
-        let mut messages: Vec<Secret> = Vec::new();
+        let mut messages = vec![];
         for row in rows{
             messages.push(row?);
         }
-        stmt.finalize().unwrap();
         Ok(messages)
     }
 

@@ -6,7 +6,7 @@ use bluesome_lib::processing::encryption::*;
 use bluesome_lib::auth::key_derivation::*;
 use hex_literal::hex;
 use std::fs;
-//use bluesome_lib::utils::encode_to_hex;
+use bluesome_lib::utils::encode_to_hex;
 
 fn bench(c: &mut Criterion) {
     let nonce = generate_nonce();
@@ -21,7 +21,7 @@ fn bench(c: &mut Criterion) {
     let param_hex = ParamHex::encode(param.clone());
 
     // Secret nonce
-    //let mut nonce_secret = Vec::new();
+    let mut nonce = Vec::new();
 
     //DB connection
     let mut db = DBManager::open("bench.sqlite3").unwrap();
@@ -40,24 +40,24 @@ fn bench(c: &mut Criterion) {
 
     // create secret
     c.bench_function("insert_data_secret", |b| b.iter(|| {
-        let nonce = generate_nonce();
-        let secret = Secret::create(&key, nonce, param.ad.clone(), String::from("test"), plaint_text.clone());
+        nonce = generate_nonce();
+        let secret = Secret::create(&key, nonce.clone(), param.ad.clone(), String::from("test"), plaint_text.clone());
         db.insert_data_secret(black_box(secret.clone())).unwrap()
     }));
 
     // read all secrets
-    /*c.bench_function("read all secrets", |b| b.iter(|| read_all_secrets("test.sqlite3")));
+    c.bench_function("read_all_secrets", |b| b.iter(|| db.read_all_secrets()));
 
     // read one secrets
-    c.bench_function("read data", |b| b.iter(|| read_secret(black_box("test.sqlite3"), black_box(encode_to_hex(nonce_secret.clone()).as_str()))));
+    c.bench_function("read_data", |b| b.iter(|| db.read_secret(black_box(encode_to_hex(nonce.clone()).as_str()))));
 
     // update data
-    c.bench_function("update data", |b|{
-        let secret = Secret::create(&key, param.ad.clone(), nonce_secret.clone(), String::from("test 1"), plaint_text);
-        b.iter(|| update_secret(black_box("test.sqlite3"), black_box(secret.clone())))});
+    c.bench_function("update_data", |b|{
+        let secret = Secret::create(&key, nonce.clone(), param.ad.clone(), String::from("test 1"), plaint_text.clone());
+        b.iter(|| db.update_secret(black_box(secret.clone())))});
 
-    c.bench_function("remove data", |b| b.iter(|| remove_secret(black_box("test.sqlite3"), black_box(encode_to_hex(nonce_secret.clone())))));
-*/
+    c.bench_function("remove data", |b| b.iter(|| db.remove_secret(black_box(encode_to_hex(nonce.clone())))));
+
     fs::remove_file("bench.sqlite3").unwrap();
     fs::remove_file("bench.sqlite3-shm").unwrap();
     fs::remove_file("bench.sqlite3-wal").unwrap();
