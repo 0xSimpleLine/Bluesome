@@ -32,6 +32,7 @@ pub fn read_db_file(path: &str) -> Result<String> {
 pub struct DBManager{
     pub conn: Connection
 }
+
 impl DBManager{
 
     //get the content of db file to connect to database or create new database if don't exist
@@ -51,7 +52,17 @@ impl DBManager{
 
         //Run request to create table 
         tx.execute_batch(
-            "CREATE TABLE IF NOT EXISTS param (
+            "CREATE TABLE IF NOT EXISTS user (
+                id INTEGER PRIMARY KEY,
+                username VARCHAR NOT NULL UNIQUE
+            );
+            
+            CREATE TABLE IF NOT EXISTS category (
+                id INTEGER PRIMARY KEY,
+                name VARCHAR NOT NULL UNIQUE
+            );
+
+            CREATE TABLE IF NOT EXISTS param (
                 id VARCHAR PRIMARY KEY UNIQUE,
                 ad VARCHAR NOT NULL,
                 salt1 VARCHAR NOT NULL,
@@ -60,11 +71,76 @@ impl DBManager{
 
             CREATE TABLE IF NOT EXISTS secret (
                 id VARCHAR PRIMARY KEY UNIQUE,
-                title VARCHAR,
-                message VARCHAR NOT NULL
+                category_id INTEGER not null,
+                title VARCHAR NOT NULL,
+                message VARCHAR NOT NULL,
+                note TEXT,
+                FOREIGN KEY (category_id) REFERENCES category(id)
             );"
         )?;
         tx.commit().unwrap();
+        Ok(())
+    }
+
+    //Insert data in table User
+    pub fn insert_data_user(&self, user: User) -> Result<()>{
+        //Insert data into table param
+        self.conn.prepare(
+            "INSERT INTO user (username) VALUES (?1)",)
+            .unwrap().execute(params![user.username])?;
+        Ok(())
+    }
+
+    pub fn update_user(&self, user: User) -> Result<()> {
+        self.conn.execute("UPDATE user SET username = ?1 WHERE id = 1",
+            [user.username])?;
+        Ok(())
+    }
+
+    pub fn read_user_data(&self) -> Result<String>{
+        self.conn.query_row("SELECT * FROM user WHERE id = 1", 
+            [],
+            |row| row.get(1))
+    }
+
+    //Insert data in table Categorie
+    pub fn insert_data_category(&self, category: Category) -> Result<()>{
+        //Insert data into table param
+        self.conn.prepare(
+            "INSERT INTO category (name) VALUES (?1)",)
+            .unwrap().execute(params![category.name])?;
+        Ok(())
+    }
+
+    pub fn read_all_categories(&self) -> Result<Vec<Category>>{
+        let mut stmt = self.conn.prepare("SELECT name FROM category")
+            .expect("Impossible to read all categories");
+        let rows = stmt.query_map([], |row| {
+            Ok(Category {
+                id: row.get(0)?,
+                name: row.get(1)?
+            })})?;
+        let mut messages = vec![];
+        for row in rows{
+            messages.push(row?);
+        }
+        Ok(messages)
+    }
+
+    pub fn find_category(&self, id: &str) -> Result<String>{
+        self.conn.query_row("SELECT name from Category where id = ?1",
+            [id], |row| row.get(0)) 
+    }
+
+    pub fn update_category(&self, category: Category) -> Result<()>{
+        self.conn.execute("UPDATE category SET name = ?1 where id = ?2", 
+            [category.name, category.id])?;
+        Ok(())
+    }
+
+    pub fn remove_category(&self, id: &str) -> Result<()>{
+        self.conn.execute("DELETE from category where id = ?1", 
+            [id])?;
         Ok(())
     }
 
@@ -80,11 +156,12 @@ impl DBManager{
     }
 
     //Insert data in table Secret
-    pub fn insert_data_secret(&self, secret: Secret) -> Result<()> {
+    pub fn insert_data_secret(&self, secret: Secret, category: Category) -> Result<()> {
         self.conn.prepare(
-            "INSERT INTO secret (id, title, message) VALUES (?1, ?2, ?3)",).unwrap().execute(params![secret.id, 
+            "INSERT INTO secret (id, title, message, category_id) VALUES (?1, ?2, ?3, ?4)",).unwrap().execute(params![secret.id, 
             secret.title, 
-            secret.message])?;
+            secret.message,
+            category.id])?;
         Ok(())
     }
 
@@ -107,10 +184,9 @@ impl DBManager{
 
     //Read one data from table secret 
     pub fn read_secret(&self, id: &str) -> Result<String>{
-        let secret = self.conn.query_row("SELECT title, message FROM secret WHERE id = ?1",
+        self.conn.query_row("SELECT title, message FROM secret WHERE id = ?1",
             [id],
-            |row| row.get(0))?;
-        Ok(secret)
+            |row| row.get(0))
     }
 
     //Modify one data from table secret

@@ -26,12 +26,21 @@ pub struct Secret {
     pub message: String
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub struct User {
+    pub username: String
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct Category {
+    pub id: String,
+    pub name: String
+}
+
 //Implement in type Param a constructor and some methods
 impl Param{
     //Create data and encrypt the field associated data (or ad) type of Param 
-    pub fn create(id: Vec<u8>, ad: Vec<u8>, salt1: Vec<u8>, salt2: Vec<u8>) -> Param{
-        Param{id, ad, salt1, salt2}
-    }
+    pub fn create(id: Vec<u8>, ad: Vec<u8>, salt1: Vec<u8>, salt2: Vec<u8>) -> Param{ Param{id, ad, salt1, salt2} }
 
     //Decode field from hex
     pub fn decode(id: String, ad: String, salt1: String, salt2: String) -> Param{
@@ -103,3 +112,5 @@ impl Secret{
         String::from_utf8(value_decrypted).unwrap()
     }
 }
+
+
