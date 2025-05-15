@@ -19,12 +19,12 @@ mod test_db {
         };
 
         let category = Category{
-            id: String::from("1"),
+            id: 1,
             name: String::from("foo")
         };
 
         let mut _category = Category{
-            id: String::from("2"),
+            id: 2,
             name: String::from("bar")
         };
 
@@ -52,8 +52,8 @@ mod test_db {
         db.insert_data_secret(secret.clone(), category.clone()).unwrap();
         db.insert_data_secret(_secret.clone(), category.clone()).unwrap();
 
+
         //Read datas
-        
         let secrets = db.read_all_secrets().unwrap();
         let secret_ = db.read_secret("foo").unwrap();
         assert_eq!(secrets, vec![secret.clone(), _secret.clone()]);
@@ -62,10 +62,10 @@ mod test_db {
         let user_ = db.read_user_data().unwrap();
         assert_eq!(user_, "foo".to_string());
 
-        let category = db.find_category(category.id.as_str()).unwrap();
-        let category_ = db.find_category(_category.id.as_str()).unwrap();
-        assert_eq!(category, "foo".to_string());
-        assert_eq!(category_, "bar".to_string());
+        let category_ = db.find_category(category.id).unwrap();
+        let categories = db.read_all_categories().unwrap();
+        assert_eq!(category_, category.name);
+        assert_eq!(vec![category.clone(), _category.clone()], categories);
 
 
         //update datas
@@ -76,21 +76,24 @@ mod test_db {
         
         _category.name = "foobar".to_string();
         db.update_category(_category.clone()).unwrap();
-        let category_ = db.find_category(_category.id.as_str()).unwrap();
+        let category_ = db.find_category(_category.id).unwrap();
         assert_eq!(_category.name, category_);
 
         _secret.message = "foo".to_string();
         _secret.title = "foo".to_string();
         db.update_secret(_secret.clone()).unwrap();
         let secrets_ = db.read_all_secrets().unwrap();
-        assert_eq!(secrets_, vec![secret.clone(), _secret.clone()]);
+        assert_eq!(vec![secret.clone(), _secret.clone()], secrets_);
 
         //Delete Data
-        db.remove_category(_category.id.as_str()).unwrap();
-        
+        db.remove_category(_category.id).unwrap();
+        let categories = db.read_all_categories().unwrap();
+        assert_eq!(vec![category], categories);    
+
         db.remove_secret(_secret.id.clone()).unwrap();
         let _secrets = db.read_all_secrets().unwrap();
-        assert_eq!(_secrets, vec![secret]);
+        assert_eq!(vec![secret], _secrets);
+
         db.conn.close().unwrap();
 
 

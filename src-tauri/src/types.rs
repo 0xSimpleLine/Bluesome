@@ -33,7 +33,7 @@ pub struct User {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Category {
-    pub id: String,
+    pub id: u8,
     pub name: String
 }
 

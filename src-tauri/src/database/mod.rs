@@ -113,32 +113,32 @@ impl DBManager{
     }
 
     pub fn read_all_categories(&self) -> Result<Vec<Category>>{
-        let mut stmt = self.conn.prepare("SELECT name FROM category")
+        let mut stmt = self.conn.prepare("SELECT id, name FROM category")
             .expect("Impossible to read all categories");
         let rows = stmt.query_map([], |row| {
             Ok(Category {
                 id: row.get(0)?,
                 name: row.get(1)?
             })})?;
-        let mut messages = vec![];
+        let mut categories = vec![];
         for row in rows{
-            messages.push(row?);
+            categories.push(row?);
         }
-        Ok(messages)
+        Ok(categories)
     }
 
-    pub fn find_category(&self, id: &str) -> Result<String>{
+    pub fn find_category(&self, id: u8) -> Result<String>{
         self.conn.query_row("SELECT name from Category where id = ?1",
             [id], |row| row.get(0)) 
     }
 
     pub fn update_category(&self, category: Category) -> Result<()>{
         self.conn.execute("UPDATE category SET name = ?1 where id = ?2", 
-            [category.name, category.id])?;
+            params![category.name, category.id])?;
         Ok(())
     }
 
-    pub fn remove_category(&self, id: &str) -> Result<()>{
+    pub fn remove_category(&self, id: u8) -> Result<()>{
         self.conn.execute("DELETE from category where id = ?1", 
             [id])?;
         Ok(())
