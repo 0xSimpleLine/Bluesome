@@ -9,7 +9,7 @@ pub fn decrypt_secret(key: &[u8], nonce: &[u8], ad: &[u8], cipher_text: Vec<u8>)
     let key = Key::<Aes256Gcm>::from_slice(key);
     let nonce = Nonce::from_slice(nonce);
     let cipher = Aes256Gcm::new(key);
-    cipher.decrypt_in_place(nonce, ad.as_ref(), &mut plaint_text).expect("Decryption failed");
+    cipher.decrypt_in_place(nonce, ad, &mut plaint_text).expect("Decryption failed");
     Ok(plaint_text)
 }
 

@@ -51,21 +51,6 @@ impl Param{
             salt2:  decode_from_hex(salt2).unwrap(),
         }
     }
-
-    //Encrypt AD 
-    pub fn encrypt(&mut self, key: &[u8]){
-        self.ad = encryption::encrypt_params(key,
-            self.id.as_slice(),
-            self.ad.clone()).unwrap();  
-    }
-
-    //Decrypt the field associated data (ad)
-    pub fn decrypt(self, key: &[u8]) -> Vec<u8>{
-        let value_decrypted = decryption::decrypt_params(key,
-            self.id.as_slice(),
-            self.ad).unwrap();
-        value_decrypted
-    }
 }
 
 
@@ -105,7 +90,7 @@ impl Secret{
         //decrypted the message
         let value_decrypted = decryption::decrypt_secret(key,
             decode_from_hex(self.id).unwrap().as_slice(),
-            ad.as_slice(),
+            &ad,
             Base64::decode_vec(self.message.as_str()).unwrap()).unwrap();
 
         //convert the vector to String

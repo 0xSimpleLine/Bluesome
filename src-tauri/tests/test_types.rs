@@ -22,15 +22,6 @@ mod test_types{
         let ad = generate_ad();
         let ad_hex = encode_to_hex(ad.clone());
 
-        // Create data with type 
-        let mut param = Param::create(nonce.clone(), ad.clone(), salts[0].clone(), salts[1].clone());
-        param.encrypt(&KEY);
-        //Verify if ad is encrypted correctly
-        assert_ne!(ad, param.ad);
-
-        //Verify if ad is decrypted correctly
-        assert_eq!(ad, param.decrypt(&KEY));
-
         //Verify if the fields are decode to hexadecimal
         let param_decoded = Param::decode(nonce_hex.clone(), ad_hex, salts_hex.0.clone(), salts_hex.1.clone());
         assert_eq!(nonce, param_decoded.id);
@@ -42,18 +33,15 @@ mod test_types{
     //Test method and constructor for Secret type
     #[test]
     fn test_secret(){
-        let nonce1 = generate_nonce();
-        let nonce2 = generate_nonce();
-        let salts = generate_salts();
-        let plaint_text = String::from("d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a721c3c0c95956809532fcf0e2449a6b525b16aedf5aa0de657ba637b391aafd255");
+        let nonce = generate_nonce();
         let ad = generate_ad();
-        let _param = Param::create(nonce1.clone(), ad.clone(), salts[0].clone(), salts[1].clone());
-        let secret = Secret::create(&KEY, ad.clone(), nonce2, String::from("test"), plaint_text.clone());
+        let plaint_text = String::from("d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a721c3c0c95956809532fcf0e2449a6b525b16aedf5aa0de657ba637b391aafd255");
+        let secret = Secret::create(&KEY, nonce, ad.clone(), String::from("test"), plaint_text.clone());
         
         //Verify if message has been encrypted
         assert_ne!(plaint_text, secret.message);
 
         //Verify if message is same that the text origin
-        assert_eq!(secret.decrypt(&KEY, ad), plaint_text);
+        assert_eq!(plaint_text, secret.decrypt(&KEY, ad));
     }
 }
