@@ -7,8 +7,8 @@ const KEY : [u8;32] = hex!("feffe9928665731c6d6a8f9467308308feffe9928665731c6d6a
 mod test_types{
     use super::*;
     use bluesome_lib::types::*;
-    use bluesome_lib::processing::encryption::{generate_nonce, generate_ad};
-    use bluesome_lib::auth::key_derivation::generate_salts;
+    use bluesome_lib::processing::{generate_nonce, generate_ad};
+    use bluesome_lib::auth::key_derivation::generate_salt;
     
     //Test method and constructor for Param type
     #[test]
@@ -16,18 +16,17 @@ mod test_types{
         // Generate Nonce
         let nonce = generate_nonce();
         let nonce_hex = encode_to_hex(nonce.clone());
-        // Generate salts
-        let salts = generate_salts();
-        let salts_hex = (encode_to_hex(salts[0].clone()), encode_to_hex(salts[1].clone()));
+        // Generate salt
+        let salt = generate_salt();
+        let salt_hex = encode_to_hex(salt.clone());
         let ad = generate_ad();
         let ad_hex = encode_to_hex(ad.clone());
 
         //Verify if the fields are decode to hexadecimal
-        let param_decoded = Param::decode(nonce_hex.clone(), ad_hex, salts_hex.0.clone(), salts_hex.1.clone());
+        let param_decoded = Param::decode(nonce_hex.clone(), ad_hex, salt_hex.clone());
         assert_eq!(nonce, param_decoded.id);
         assert_eq!(ad, param_decoded.ad);
-        assert_eq!(salts[0], param_decoded.salt1);
-        assert_eq!(salts[1], param_decoded.salt2);
+        assert_eq!(salt, param_decoded.salt);
     }
 
     //Test method and constructor for Secret type

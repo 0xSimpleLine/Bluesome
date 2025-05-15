@@ -2,52 +2,9 @@
 // Data used for these tests comes from: https://github.com/google/boringssl/blob/master/crypto/cipher_extra/test/cipher_tests.txt
 #[cfg(test)]
 mod test_processing{
-    use bluesome_lib::processing::encryption::*;
-    use bluesome_lib::processing::decryption::*;
+    use bluesome_lib::processing::*;
     use bluesome_lib::utils::{encode_to_hex, decode_from_hex};
     use hex_literal::hex;
-
-    // Test the encryption and decryption function for parameters
-    #[test]
-    fn param_encryption_decryption_test(){
-        // Phase 1 (Simple test)
-        //Keys
-        let key_1 = hex!("0000000000000000000000000000000000000000000000000000000000000000");
-        let key_2 = hex!("feffe9928665731c6d6a8f9467308308feffe9928665731c6d6a8f9467308308");
-
-        //Nonces
-        let nonce_1 = hex!("000000000000000000000000").to_vec();
-        let nonce_2 = hex!("cafebabefacedbaddecaf888").to_vec();
-
-        //Plaint text
-        let plaint_text_1 = "".as_bytes().to_vec();
-        let plaint_text_2 = decode_from_hex("d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a721c3c0c95956809532fcf0e2449a6b525b16aedf5aa0de657ba637b391aafd255".to_string()).unwrap();
-        let plaint_text_3 = "d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a721c3c0c95956809532fcf0e2449a6b525b16aedf5aa0de657ba637b391aafd255";
-
-        //Tags
-        let tag_1 = "530f8afbc74536b9a963b4f1c4cb738b";
-        let tag_2 = decode_from_hex("530f8afbc74536b9a963b4f1c4cb738b".to_string()).unwrap();
-        let tag_3 =  "b094dac5d93471bdec1a502270e3cc6c";
-
-        //Cipher text
-        let cipher_text_1 = "522dc1f099567d07f47f37a32a84427d643a8cdcbfe5c0c97598a2bd2555d1aa8cb08e48590dbb3da7b08b1056828838c5f61e6393ba7a0abcc9f662898015ad";
-        let cipher_text_2 = decode_from_hex("522dc1f099567d07f47f37a32a84427d643a8cdcbfe5c0c97598a2bd2555d1aa8cb08e48590dbb3da7b08b1056828838c5f61e6393ba7a0abcc9f662898015adb094dac5d93471bdec1a502270e3cc6c".to_string()).unwrap();
-
-        //Phase 1
-        let result_encrypt = encrypt_params(key_1.as_slice(), &nonce_1, plaint_text_1).unwrap();
-        assert_eq!(encode_to_hex(result_encrypt), tag_1.to_string());
-
-        let result_encrypt = encrypt_params(key_2.as_slice(), &nonce_2, plaint_text_2).unwrap();
-        assert_eq!(encode_to_hex(result_encrypt), format!("{}{}", cipher_text_1, tag_3));
-
-        // Phase 2
-        let result_1 = decrypt_params(key_1.as_slice(), &nonce_1, tag_2).unwrap();
-        assert_eq!(encode_to_hex(result_1), "");
-
-        // Phase 3 
-        let result_2 = decrypt_params(key_2.as_slice(), &nonce_2, cipher_text_2).unwrap();
-        assert_eq!(encode_to_hex(result_2), plaint_text_3.to_string());
-    }
 
     //Test the encryption and decryption function for secrets
     #[test]

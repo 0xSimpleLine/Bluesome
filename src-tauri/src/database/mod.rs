@@ -65,8 +65,7 @@ impl DBManager{
             CREATE TABLE IF NOT EXISTS param (
                 id VARCHAR PRIMARY KEY UNIQUE,
                 ad VARCHAR NOT NULL,
-                salt1 VARCHAR NOT NULL,
-                salt2 VARCHAR NOT NULL
+                salt VARCHAR NOT NULL
             );
 
             CREATE TABLE IF NOT EXISTS secret (
@@ -148,10 +147,9 @@ impl DBManager{
     pub fn insert_data_param(&self, param_hex: ParamHex) -> Result<()>{
         //Insert data into table param
         self.conn.prepare(
-            "INSERT INTO param (id, ad, salt1, salt2) VALUES (?1, ?2, ?3, ?4)",).unwrap().execute(params![param_hex.id, 
+            "INSERT INTO param (id, ad, salt) VALUES (?1, ?2, ?3)",).unwrap().execute(params![param_hex.id, 
             param_hex.ad, 
-            param_hex.salt1,
-            param_hex.salt2])?;
+            param_hex.salt])?;
         Ok(())
     }
 

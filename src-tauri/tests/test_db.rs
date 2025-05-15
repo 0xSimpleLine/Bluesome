@@ -10,8 +10,7 @@ mod test_db {
         let param_hex = ParamHex{
             id: String::from("foo").into(),
             ad: String::from("foo").into(),
-            salt1: String::from("foo").into(),
-            salt2: String::from("foo").into()
+            salt: String::from("foo").into(),
         };
 
         let mut user = User{
